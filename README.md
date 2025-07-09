@@ -18,6 +18,6 @@
 
 ### Для других ОС
 ```bash
-git clone https://github.com/ваш-логин/SmartDownloadsSorter.git
+git clone https://github.com/Black12341212/SmartDownloadsSorter.git
 cd SmartDownloadsSorter
 python sorter.py
