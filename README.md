@@ -14,7 +14,7 @@
 
 ## ⬇️ Скачать
 ### Для Windows
-[SmartSorter.exe](https://github.com/Black12341212/SmartDownloadsSorter.exe) - просто скачайте и запустите
+[SmartSorter.exe](https://github.com/Black12341212/SmartDownloadsSorter.git) - просто скачайте и запустите
 
 ### Для других ОС
 ```bash
