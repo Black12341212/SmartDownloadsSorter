@@ -21,3 +21,4 @@
 git clone https://github.com/Black12341212/SmartDownloadsSorter.git
 cd SmartDownloadsSorter
 python sorter.py
+![image](https://github.com/user-attachments/assets/a6720965-9c35-47c3-a6b7-bb83514768bd)
