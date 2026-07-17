@@ -111,7 +111,3 @@ To build as `.exe`:
 pip install pyinstaller
 pyinstaller --onefile --name SmartSorter sorter.py
 ```
-<img width="902" height="682" alt="image" src="https://github.com/user-attachments/assets/122f759c-80c7-4f00-b76e-66da0162cf0c" />
-<img width="902" height="682" alt="image" src="https://github.com/user-attachments/assets/466e10ab-d856-4045-abbd-d3fb88998aee" />
-<img width="902" height="682" alt="image" src="https://github.com/user-attachments/assets/3ad1ffcd-e360-4877-9088-0281c0257604" />
-<img width="902" height="682" alt="image" src="https://github.com/user-attachments/assets/4acf1ffe-e7cc-4355-a1d1-209349b93da6" />
