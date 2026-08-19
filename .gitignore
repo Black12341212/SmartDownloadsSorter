@@ -1,0 +1,19 @@
+# Build artifacts
+*.exe
+__pycache__/
+*.pyc
+
+# Runtime config artifacts
+config/sorter.log
+config/history.json
+config/backup_*.zip
+*.zip
+
+# OS / editor
+.DS_Store
+Thumbs.db
+venv/
+.venv/
+
+# Local screenshots (referenced via external GitHub URLs in README)
+screenshot*.png

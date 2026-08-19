@@ -4,6 +4,8 @@
 
 Version 3.0 adds 18 new features: real-time file monitoring, multi-folder support, content-based detection, AI rule suggestions, auto-cleanup, drag & drop, regex tester, dark theme, backup/restore, keyboard shortcuts, file preview, nested rules, notifications, logging dashboard, portable mode, i18n, scheduled cleanup, and cloud API stubs.
 
+> **Critical bugfixes in this build:** file-move errors are now reported instead of being silently counted as "skipped"; default rules are no longer mutated in place; backup restore is protected against Zip Slip path traversal; portable mode initializes before config load; the GUI no longer freezes during a sort; `SorterEngine.sort()` is thread-safe; and undo no longer reports a false success when the source file is missing.
+
 ---
 
 ## Features

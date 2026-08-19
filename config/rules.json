@@ -1,0 +1,271 @@
+{
+    "Images": {
+        "folder": "Images",
+        "extensions": [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".bmp",
+            ".svg",
+            ".webp",
+            ".ico",
+            ".tiff",
+            ".raw"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Videos": {
+        "folder": "Videos",
+        "extensions": [
+            ".mp4",
+            ".avi",
+            ".mkv",
+            ".mov",
+            ".wmv",
+            ".flv",
+            ".webm",
+            ".m4v",
+            ".ts"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Documents": {
+        "folder": "Documents",
+        "extensions": [
+            ".doc",
+            ".docx",
+            ".txt",
+            ".odt",
+            ".rtf",
+            ".pages"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Spreadsheets": {
+        "folder": "Documents/Spreadsheets",
+        "extensions": [
+            ".xls",
+            ".xlsx",
+            ".csv",
+            ".ods",
+            ".numbers"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Presentations": {
+        "folder": "Documents/Presentations",
+        "extensions": [
+            ".ppt",
+            ".pptx",
+            ".odp",
+            ".key"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "PDF_Books": {
+        "folder": "PDF/Books",
+        "extensions": [
+            ".pdf"
+        ],
+        "name_contains": [
+            "book",
+            "книга",
+            "учебник",
+            "tutorial",
+            "guide",
+            "manual"
+        ],
+        "regex": [
+            "(?i)(book|guide|tutorial|manual|учебник)"
+        ],
+        "size_min_mb": 5
+    },
+    "PDF_Articles": {
+        "folder": "PDF/Articles",
+        "extensions": [
+            ".pdf"
+        ],
+        "name_contains": [
+            "article",
+            "статья",
+            "paper",
+            "journal"
+        ],
+        "regex": [
+            "(?i)(article|paper|journal|статья)"
+        ],
+        "size_max_mb": 5
+    },
+    "PDF_Scans": {
+        "folder": "PDF/Scans",
+        "extensions": [
+            ".pdf"
+        ],
+        "name_contains": [
+            "scan",
+            "скан",
+            "copy",
+            "копия"
+        ],
+        "regex": [
+            "(?i)(scan|скан|copy)"
+        ]
+    },
+    "PDF_Forms": {
+        "folder": "PDF/Forms",
+        "extensions": [
+            ".pdf"
+        ],
+        "name_contains": [
+            "form",
+            "форма",
+            "заявление",
+            "договор",
+            "contract",
+            "invoice",
+            "receipt"
+        ],
+        "regex": [
+            "(?i)(form|заявка|заявление|договор|contract|invoice|receipt|счет)"
+        ]
+    },
+    "PDF_Other": {
+        "folder": "PDF/Other",
+        "extensions": [
+            ".pdf"
+        ],
+        "name_contains": [],
+        "regex": [],
+        "is_default_pdf": true
+    },
+    "Archives": {
+        "folder": "Archives",
+        "extensions": [
+            ".zip",
+            ".rar",
+            ".7z",
+            ".tar",
+            ".gz",
+            ".bz2",
+            ".xz"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Audio": {
+        "folder": "Audio",
+        "extensions": [
+            ".mp3",
+            ".wav",
+            ".flac",
+            ".aac",
+            ".ogg",
+            ".wma",
+            ".m4a",
+            ".opus"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Programs": {
+        "folder": "Programs",
+        "extensions": [
+            ".exe",
+            ".msi",
+            ".app",
+            ".dmg",
+            ".deb",
+            ".rpm",
+            ".apk"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Code": {
+        "folder": "Code",
+        "extensions": [
+            ".py",
+            ".js",
+            ".html",
+            ".css",
+            ".cpp",
+            ".java",
+            ".c",
+            ".h",
+            ".php",
+            ".sql",
+            ".json",
+            ".xml",
+            ".yaml",
+            ".yml",
+            ".ts",
+            ".jsx",
+            ".tsx",
+            ".go",
+            ".rs",
+            ".rb"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Fonts": {
+        "folder": "Fonts",
+        "extensions": [
+            ".ttf",
+            ".otf",
+            ".woff",
+            ".woff2",
+            ".eot"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Models3D": {
+        "folder": "Models3D",
+        "extensions": [
+            ".stl",
+            ".obj",
+            ".fbx",
+            ".blend",
+            ".3ds",
+            ".dae",
+            ".glb",
+            ".gltf"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "Subtitles": {
+        "folder": "Subtitles",
+        "extensions": [
+            ".srt",
+            ".sub",
+            ".ass",
+            ".vtt",
+            ".ssa"
+        ],
+        "name_contains": [],
+        "regex": []
+    },
+    "ISO_DiscImages": {
+        "folder": "ISO",
+        "extensions": [
+            ".iso",
+            ".img",
+            ".vmdk",
+            ".vhd",
+            ".vhdx",
+            ".bin",
+            ".cue",
+            ".nrg"
+        ],
+        "name_contains": [],
+        "regex": []
+    }
+}

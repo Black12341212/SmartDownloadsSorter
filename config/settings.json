@@ -1,0 +1,15 @@
+{
+    "downloads_path": "C:/Users/USER/Downloads",
+    "cloud_path": "",
+    "cloud_categories": [],
+    "auto_sort_interval": 15,
+    "auto_sort_enabled": false,
+    "sort_by_date": false,
+    "launch_on_startup": false,
+    "theme": "default",
+    "pdf_settings": {
+        "enable_smart_pdf": true,
+        "pdf_size_analysis": true,
+        "pdf_name_patterns": true
+    }
+}
