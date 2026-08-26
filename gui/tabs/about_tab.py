@@ -93,11 +93,28 @@ class AboutTab:
                   font=("", 9), foreground="gray").pack()
 
     def _find_qr(self):
-        base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        for name in os.listdir(base):
-            if name.startswith("qr_") and name.endswith(".png"):
-                return os.path.join(base, name)
+        candidates = []
+        if getattr(sys, "frozen", False):
+            meipass = getattr(sys, "_MEIPASS", None)
+            if meipass:
+                candidates.append(meipass)
+        candidates.append(self._app_base_dir())
+        for base in candidates:
+            try:
+                for name in os.listdir(base):
+                    if name.startswith("qr_") and name.endswith(".png"):
+                        return os.path.join(base, name)
+            except OSError:
+                continue
         return None
+
+    @staticmethod
+    def _app_base_dir():
+        try:
+            from core.portable import get_app_dir
+            return get_app_dir()
+        except ImportError:
+            return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     def _open_donate(self):
         webbrowser.open(self.DONATE_URL)
