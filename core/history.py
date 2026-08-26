@@ -6,10 +6,10 @@ import json
 import os
 import shutil
 from datetime import datetime
-from pathlib import Path
 
-CONFIG_DIR = str(Path(__file__).parent.parent / "config")
-HISTORY_FILE = os.path.join(CONFIG_DIR, "history.json")
+from core.portable import get_config_dir
+
+HISTORY_FILE = os.path.join(get_config_dir(), "history.json")
 MAX_HISTORY = 1000
 
 
@@ -49,21 +49,28 @@ class HistoryManager:
 
     def undo_last(self, count=1):
         undone = []
-        for _ in range(min(count, len(self.entries))):
-            entry = self.entries.pop()
+        failed = []
+        count = min(count, len(self.entries))
+        batch = self.entries[len(self.entries) - count:]
+        self.entries = self.entries[:len(self.entries) - count]
+        for entry in reversed(batch):
             src = entry["dest"]
             dst = entry["source"]
+            moved_back = False
             if os.path.exists(src):
                 try:
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
                     shutil.move(src, dst)
                     undone.append(entry)
-                    continue
+                    moved_back = True
                 except Exception:
                     pass
-            # Source file no longer exists or the move back failed:
-            # keep the record in history so it is not silently lost.
-            self.entries.append(entry)
+            if not moved_back:
+                # Source file no longer exists or the move back failed:
+                # keep the record in history so it is not silently lost,
+                # but do not retry it within this undo batch.
+                failed.append(entry)
+        self.entries.extend(reversed(failed))
         self.save()
         return undone
 

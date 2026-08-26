@@ -14,6 +14,8 @@ class DuplicatesTab:
     def __init__(self, parent, app):
         self.app = app
         self.frame = ttk.Frame(parent)
+        self._groups = {}
+        self._use_hash_at_scan = False
         self._build()
 
     def _build(self):
@@ -57,19 +59,22 @@ class DuplicatesTab:
             return
 
         self.tree.delete(*self.tree.get_children())
-        results, wasted = get_duplicate_summary(path, self.use_hash_var.get())
+        self._groups = {}
+        self._use_hash_at_scan = self.use_hash_var.get()
+        results, wasted = get_duplicate_summary(path, self._use_hash_at_scan)
         self.summary_var.set(self.app.i18n.t("msg_duplicates_found",
                                               len(results), f"{wasted/(1024*1024):.1f}"))
 
         for group in results:
             paths_str = "\n".join(group["paths"][:3])
-            self.tree.insert("", tk.END, values=(
+            iid = self.tree.insert("", tk.END, values=(
                 group["name"],
                 group["count"],
                 f"{group['size']/(1024*1024):.2f}",
                 f"{group['wasted']/(1024*1024):.2f}",
                 paths_str,
             ))
+            self._groups[iid] = group
 
     def _delete_selected(self):
         sel = self.tree.selection()
@@ -80,15 +85,12 @@ class DuplicatesTab:
             return
         deleted_total = 0
         for item in sel:
-            vals = self.tree.item(item)["values"]
-            name = vals[0]
-            path = self.app.engine.downloads_path
-            from core.duplicates import find_duplicates_by_name_size
-            groups = find_duplicates_by_name_size(path)
-            for key, paths in groups.items():
-                if os.path.basename(paths[0]) == name:
-                    _, deleted = delete_duplicates(paths)
-                    deleted_total += len(deleted)
-                    break
+            group = self._groups.get(item)
+            if not group:
+                continue
+            _, deleted = delete_duplicates(
+                group["paths"], verify_hash=self._use_hash_at_scan
+            )
+            deleted_total += len(deleted)
         self.tree.delete(*sel)
         self.summary_var.set(self.app.i18n.t("msg_deleted_n", deleted_total))

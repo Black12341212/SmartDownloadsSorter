@@ -7,10 +7,10 @@ v3.0: Added nested/conditional rules support
 import copy
 import json
 import os
-from pathlib import Path
 
-CONFIG_DIR = str(Path(__file__).parent.parent / "config")
-RULES_FILE = os.path.join(CONFIG_DIR, "rules.json")
+from core.portable import get_config_dir
+
+RULES_FILE = os.path.join(get_config_dir(), "rules.json")
 
 DEFAULT_RULES = {
     "Images": {

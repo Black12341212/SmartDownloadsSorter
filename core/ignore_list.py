@@ -5,10 +5,10 @@
 import fnmatch
 import json
 import os
-from pathlib import Path
 
-CONFIG_DIR = str(Path(__file__).parent.parent / "config")
-IGNORE_FILE = os.path.join(CONFIG_DIR, "ignore_list.json")
+from core.portable import get_config_dir
+
+IGNORE_FILE = os.path.join(get_config_dir(), "ignore_list.json")
 
 DEFAULT_IGNORE = [
     "Thumbs.db",

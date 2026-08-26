@@ -5,10 +5,10 @@
 import json
 import os
 from datetime import datetime
-from pathlib import Path
 
-CONFIG_DIR = str(Path(__file__).parent.parent / "config")
-PROFILES_DIR = os.path.join(CONFIG_DIR, "profiles")
+from core.portable import get_config_dir
+
+PROFILES_DIR = os.path.join(get_config_dir(), "profiles")
 
 
 class ProfileManager:

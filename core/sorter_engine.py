@@ -35,11 +35,11 @@ class SorterEngine:
         self.error_count = 0
         self._lock = threading.Lock()
 
-    def sort(self, dry_run=False, target_path=None):
+    def sort(self, dry_run=False, target_path=None, only_files=None):
         with self._lock:
-            return self._sort_locked(dry_run, target_path)
+            return self._sort_locked(dry_run, target_path, only_files)
 
-    def _sort_locked(self, dry_run=False, target_path=None):
+    def _sort_locked(self, dry_run=False, target_path=None, only_files=None):
         scan_paths = []
         if target_path:
             scan_paths = [target_path]
@@ -63,7 +63,7 @@ class SorterEngine:
         self.error_count = 0
 
         for scan_path in scan_paths:
-            result = self._sort_single(scan_path, dry_run)
+            result = self._sort_single(scan_path, dry_run, only_files)
             total_moved += result["moved"]
             total_skipped += result["skipped"]
             total_errors += result["errors"]
@@ -80,12 +80,16 @@ class SorterEngine:
             "session_time": datetime.now().isoformat(),
         }
 
-    def _sort_single(self, scan_path, dry_run):
+    def _sort_single(self, scan_path, dry_run, only_files=None):
         if not os.path.exists(scan_path):
             return {"moved": 0, "skipped": 0, "errors": 0, "files": [], "error": f"Path not found: {scan_path}"}
 
         files = [f for f in os.listdir(scan_path)
                  if os.path.isfile(os.path.join(scan_path, f))]
+
+        if only_files is not None:
+            wanted = {os.path.basename(f) for f in only_files}
+            files = [f for f in files if f in wanted]
 
         log_sort_start(scan_path, len(files))
 

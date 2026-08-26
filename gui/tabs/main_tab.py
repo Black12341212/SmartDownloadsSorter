@@ -98,13 +98,17 @@ class MainTab:
                 file_data.append(fp)
 
         def _sort_dropped():
-            from core.sorter_engine import SorterEngine
+            by_dir = {}
             for fp in file_data:
                 if os.path.isfile(fp):
                     directory = os.path.dirname(fp)
-                    self.app.engine.downloads_path = directory
-                    self.app.engine.sort(target_path=directory)
-            self._append_log(f"Sorted {len(file_data)} dropped files")
+                    by_dir.setdefault(directory, []).append(os.path.basename(fp))
+            total = 0
+            for directory, filenames in by_dir.items():
+                result = self.app.engine.sort(target_path=directory,
+                                              only_files=filenames)
+                total += result.get("moved", 0)
+            self._append_log(f"Sorted {total} dropped files")
             win.destroy()
 
         btn_frame = ttk.Frame(win)

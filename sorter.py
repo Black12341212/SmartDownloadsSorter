@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Smart Downloads Sorter v3.0
+Smart Downloads Sorter v3.0.2
 Entry point: GUI + CLI modes
 """
 
@@ -115,7 +115,7 @@ def run_gui():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Smart Downloads Sorter v3.0",
+        description="Smart Downloads Sorter v3.0.2",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -154,7 +154,7 @@ Examples:
                         help="Output path for backup file")
     parser.add_argument("--portable", action="store_true",
                         help="Run in portable mode")
-    parser.add_argument("--version", action="version", version="Smart Sorter v3.0")
+    parser.add_argument("--version", action="version", version="Smart Sorter v3.0.2")
 
     args = parser.parse_args()
 

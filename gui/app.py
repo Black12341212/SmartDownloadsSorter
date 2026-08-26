@@ -43,7 +43,7 @@ from gui.tabs.logging_tab import LoggingTab
 
 
 class SmartSorterApp:
-    VERSION = "3.0"
+    VERSION = "3.0.2"
 
     def __init__(self):
         self.root = tk.Tk()
@@ -87,6 +87,7 @@ class SmartSorterApp:
 
         if self.settings_mgr.get("auto_sort_enabled"):
             self.scheduler.set_interval(self.settings_mgr.get("auto_sort_interval", 15))
+            self.scheduler.start()
 
         self._build_ui()
         self._apply_theme()
@@ -150,17 +151,29 @@ class SmartSorterApp:
             style.theme_use("clam")
 
     def _bind_shortcuts(self):
-        self.root.bind("<Control-s>", lambda e: self._sort_now())
-        self.root.bind("<Control-S>", lambda e: self._sort_now())
-        self.root.bind("<Control-z>", lambda e: self._undo_last())
-        self.root.bind("<Control-Z>", lambda e: self._undo_last())
+        def guarded(action):
+            def handler(event):
+                if self._is_typing():
+                    return
+                action()
+            return handler
+
+        self.root.bind("<Control-s>", guarded(self._sort_now))
+        self.root.bind("<Control-S>", guarded(self._sort_now))
+        self.root.bind("<Control-z>", guarded(self._undo_last))
+        self.root.bind("<Control-Z>", guarded(self._undo_last))
         self.root.bind("<Control-d>", lambda e: self._dry_run())
         self.root.bind("<Control-D>", lambda e: self._dry_run())
         self.root.bind("<Control-r>", lambda e: self._refresh_current_tab())
         self.root.bind("<Control-R>", lambda e: self._refresh_current_tab())
         self.root.bind("<F5>", lambda e: self._sort_now())
-        self.root.bind("<Control-q>", lambda e: self.root.quit())
-        self.root.bind("<Control-Q>", lambda e: self.root.quit())
+        self.root.bind("<Control-q>", guarded(self.root.quit))
+        self.root.bind("<Control-Q>", guarded(self.root.quit))
+
+    def _is_typing(self):
+        w = self.root.focus_get()
+        return isinstance(w, (tk.Entry, tk.Text, tk.Spinbox,
+                              ttk.Entry, ttk.Combobox, ttk.Spinbox))
 
     def _refresh_current_tab(self):
         current = self.notebook.select()
