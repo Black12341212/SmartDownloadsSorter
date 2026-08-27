@@ -1,10 +1,36 @@
-# Smart Downloads Sorter v3.0
+# Smart Downloads Sorter v3.1.0
 
 **Full automation, cloud integration, undo, duplicate detection, real-time monitoring, and a clean GUI.**
 
-Version 3.0 adds 18 new features: real-time file monitoring, multi-folder support, content-based detection, AI rule suggestions, auto-cleanup, drag & drop, regex tester, dark theme, backup/restore, keyboard shortcuts, file preview, nested rules, notifications, logging dashboard, portable mode, i18n, scheduled cleanup, and cloud API stubs.
+Version 3.0 added 18 new features: real-time file monitoring, multi-folder support, content-based detection, AI rule suggestions, auto-cleanup, drag & drop, regex tester, dark theme, backup/restore, keyboard shortcuts, file preview, nested rules, notifications, logging dashboard, portable mode, i18n, scheduled cleanup, and cloud sync.
 
-> **Critical bugfixes in this build:** file-move errors are now reported instead of being silently counted as "skipped"; default rules are no longer mutated in place; backup restore is protected against Zip Slip path traversal; portable mode initializes before config load; the GUI no longer freezes during a sort; `SorterEngine.sort()` is thread-safe; and undo no longer reports a false success when the source file is missing.
+> **Critical bugfixes in v3.0:** file-move errors are now reported instead of being silently counted as "skipped"; default rules are no longer mutated in place; backup restore is protected against Zip Slip path traversal; portable mode initializes before config load; the GUI no longer freezes during a sort; `SorterEngine.sort()` is thread-safe; and undo no longer reports a false success when the source file is missing.
+
+---
+
+## What's new in v3.1.0
+
+**Removed**
+- **Cloud API stubs** (`cloud_api_provider` / `cloud_api_token` settings and the dead Google Drive / OneDrive / Dropbox "Connect" UI). They stored tokens in plaintext and did nothing. The real **Cloud Sync** (copy sorted files to a local cloud folder) now actually runs after every sort.
+- QR-code image on the About tab (the text donate link and the **Support Project** button remain).
+- Removed duplicate TIFF / `msg_path_not_found` entries in the translation tables.
+
+**Bug fixes**
+- `i18n`: custom languages loaded from `config/translations/` can now actually be selected.
+- GUI: the path field now updates after a drag-and-drop sort; stdout capture during a sort is thread-safe; DnD parsing no longer relies on a possibly-missing `tk.splitlist`.
+- Notifications are now dispatched on the tkinter main thread (no more cross-thread crashes).
+- `Scheduler` no longer holds its lock while running the sort callback, so **Stop** is responsive.
+- `RetentionManager` correctly handles absolute folder paths.
+- `ProfileManager` sanitizes profile names, preventing path traversal (`../../evil`).
+- The filesystem watcher now sorts **only the new file**, not the whole folder.
+- Duplicate detection uses a **full-file hash** (the old 64KB+size hash caused false positives).
+- MP4 detection requires the `ftyp` brand, fixing false positives on arbitrary binary files.
+
+**Added**
+- `python sorter.py --config DIR` to run with a custom config directory (headless / portable).
+- Settings validation & migration: a corrupt `settings.json` is backed up and defaults are restored; known keys are type-checked.
+- GUI hooks for plugins: `get_gui_tab()` (adds a tab) and `get_menu_entries()` (adds menu items); plugin output is routed through the app log instead of stdout.
+- A `tests/` suite (pytest) covering the engine, detection, matching, history, duplicates, profiles, retention, i18n and cloud sync.
 
 ---
 
@@ -76,8 +102,8 @@ Full English and Russian interface with language switcher in Settings. 143 trans
 #### 17. Scheduled Cleanup
 Weekly cleanup task (e.g., every Monday at 3 AM). Configurable day and target folders.
 
-#### 18. Cloud API Stubs
-UI placeholders for Google Drive, OneDrive, Dropbox integration (API tokens ready for future implementation).
+#### 18. Cloud Sync
+Point to a local cloud folder (e.g. a synced OneDrive/Dropbox directory), choose which categories to mirror, and sorted files are copied there automatically after every sort.
 
 ### History & Undo
 - **Undo** - `python sorter.py --undo 3` or GUI button. All moves recorded in `history.json`

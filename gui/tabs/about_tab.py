@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 """Вкладка: О программе + QR-код + кнопка Поддержать v3.0"""
 
-import os
-import sys
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -59,19 +57,6 @@ class AboutTab:
         ttk.Label(center, text=self.app.i18n.t("lbl_support_desc"),
                   font=("", 10)).pack(pady=(0, 10))
 
-        qr_path = self._find_qr()
-        if qr_path:
-            try:
-                from PIL import Image, ImageTk
-                img = Image.open(qr_path)
-                img = img.resize((180, 180), Image.LANCZOS)
-                self._photo = ImageTk.PhotoImage(img)
-                ttk.Label(center, image=self._photo).pack(pady=5)
-            except ImportError:
-                ttk.Label(center, text=f"[QR: {qr_path}]", foreground="gray").pack(pady=5)
-        else:
-            ttk.Label(center, text="[QR code not found]", foreground="gray").pack(pady=5)
-
         ttk.Label(center, text=self.DONATE_URL,
                   font=("", 9), foreground="blue").pack(pady=2)
 
@@ -91,30 +76,6 @@ class AboutTab:
 
         ttk.Label(center, text=self.app.i18n.t("lbl_made_with"),
                   font=("", 9), foreground="gray").pack()
-
-    def _find_qr(self):
-        candidates = []
-        if getattr(sys, "frozen", False):
-            meipass = getattr(sys, "_MEIPASS", None)
-            if meipass:
-                candidates.append(meipass)
-        candidates.append(self._app_base_dir())
-        for base in candidates:
-            try:
-                for name in os.listdir(base):
-                    if name.startswith("qr_") and name.endswith(".png"):
-                        return os.path.join(base, name)
-            except OSError:
-                continue
-        return None
-
-    @staticmethod
-    def _app_base_dir():
-        try:
-            from core.portable import get_app_dir
-            return get_app_dir()
-        except ImportError:
-            return os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     def _open_donate(self):
         webbrowser.open(self.DONATE_URL)

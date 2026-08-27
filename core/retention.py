@@ -32,7 +32,10 @@ class RetentionManager:
         folders = self.target_folders or [base_path]
 
         for folder_name in folders:
-            folder_path = os.path.join(base_path, folder_name)
+            if os.path.isabs(folder_name):
+                folder_path = folder_name
+            else:
+                folder_path = os.path.join(base_path, folder_name)
             if not os.path.isdir(folder_path):
                 continue
             for fname in os.listdir(folder_path):

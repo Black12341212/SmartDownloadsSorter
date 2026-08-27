@@ -7,7 +7,12 @@ Drag & Drop + File Preview
 import tkinter as tk
 from tkinter import ttk, scrolledtext, messagebox
 import threading
+import io
 import os
+import sys
+
+
+_stdout_lock = threading.Lock()
 
 
 class MainTab:
@@ -68,9 +73,52 @@ class MainTab:
                 pass
 
     def _on_drop(self, event):
-        files = self.frame.tk.splitlist(event.data)
+        files = self._parse_dropped_paths(event.data)
         if files:
             self._preview_files(list(files))
+
+    def _parse_dropped_paths(self, data):
+        """Parse a Tk DND drop payload into a list of file paths.
+
+        Tk's DND_FILES handler may deliver the data as a TCL list (exposed via
+        ``tk.splitlist``) or as a plain string where paths with spaces are
+        wrapped in curly braces. Support both forms robustly; fall back to a
+        manual parser when ``splitlist`` is unavailable in this tkinter build.
+        """
+        if not data:
+            return []
+        try:
+            return [p for p in self.frame.tk.splitlist(data) if p]
+        except Exception:
+            pass
+
+        paths = []
+        text = data.strip()
+        i = 0
+        while i < len(text):
+            if text[i] == "{":
+                j = text.find("}", i)
+                if j == -1:
+                    token = text[i + 1:]
+                    if token:
+                        paths.append(token)
+                    break
+                token = text[i + 1:j]
+                if token:
+                    paths.append(token)
+                i = j + 1
+            else:
+                j = text.find(" ", i)
+                if j == -1:
+                    token = text[i:]
+                    if token:
+                        paths.append(token)
+                    break
+                token = text[i:j]
+                if token:
+                    paths.append(token)
+                i = j + 1
+        return paths
 
     def _preview_files(self, filepaths):
         win = tk.Toplevel(self.frame)
@@ -109,6 +157,10 @@ class MainTab:
                                               only_files=filenames)
                 total += result.get("moved", 0)
             self._append_log(f"Sorted {total} dropped files")
+            if len(by_dir) == 1:
+                directory = next(iter(by_dir))
+                self.path_var.set(directory)
+                self.app.engine.downloads_path = directory
             win.destroy()
 
         btn_frame = ttk.Frame(win)
@@ -136,15 +188,14 @@ class MainTab:
         threading.Thread(target=self._run_sort, args=(True,), daemon=True).start()
 
     def _run_sort(self, dry_run):
-        import io
-        import sys
         buf = io.StringIO()
-        old_stdout = sys.stdout
-        sys.stdout = buf
-        try:
-            result = self.app.engine.sort(dry_run=dry_run)
-        finally:
-            sys.stdout = old_stdout
+        with _stdout_lock:
+            old_stdout = sys.stdout
+            sys.stdout = buf
+            try:
+                result = self.app.engine.sort(dry_run=dry_run)
+            finally:
+                sys.stdout = old_stdout
         output = buf.getvalue()
         self.frame.after(0, lambda: self._show_result(output, result, dry_run))
 

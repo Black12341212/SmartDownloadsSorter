@@ -4,11 +4,25 @@
 
 import json
 import os
+import re
 from datetime import datetime
 
 from core.portable import get_config_dir
 
 PROFILES_DIR = os.path.join(get_config_dir(), "profiles")
+
+
+def sanitize_profile_name(name):
+    """Return a safe profile name that cannot escape the profiles directory.
+
+    Strips path separators and other unsafe characters, clamps the length and
+    guarantees a non-empty result.
+    """
+    if not name:
+        return "profile"
+    safe = re.sub(r'[^A-Za-z0-9_ \-]', '', str(name)).strip()
+    safe = safe[:100].strip()
+    return safe or "profile"
 
 
 class ProfileManager:
@@ -31,6 +45,7 @@ class ProfileManager:
         return profiles
 
     def save_profile(self, name, rules_data, ignore_data=None, settings_data=None):
+        name = sanitize_profile_name(name)
         profile = {
             "name": name,
             "created": datetime.now().isoformat(),
@@ -44,6 +59,7 @@ class ProfileManager:
         return path
 
     def load_profile(self, name):
+        name = sanitize_profile_name(name)
         path = os.path.join(self.profiles_dir, f"{name}.json")
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
@@ -51,6 +67,7 @@ class ProfileManager:
         return None
 
     def delete_profile(self, name):
+        name = sanitize_profile_name(name)
         path = os.path.join(self.profiles_dir, f"{name}.json")
         if os.path.exists(path):
             os.remove(path)
@@ -58,6 +75,8 @@ class ProfileManager:
         return False
 
     def rename_profile(self, old_name, new_name):
+        old_name = sanitize_profile_name(old_name)
+        new_name = sanitize_profile_name(new_name)
         old_path = os.path.join(self.profiles_dir, f"{old_name}.json")
         new_path = os.path.join(self.profiles_dir, f"{new_name}.json")
         if os.path.exists(old_path) and not os.path.exists(new_path):

@@ -72,7 +72,7 @@ class SettingsTab:
         lang_frame.pack(fill=tk.X, padx=10, pady=2)
         ttk.Label(lang_frame, text=i.t("lbl_language") + ":").pack(side=tk.LEFT)
         self.lang_var = tk.StringVar(value=self.app.settings_mgr.get("language", "en"))
-        lang_names = {"en": "English", "ru": "Русский"}
+        lang_names = i.get_available_languages()
         ttk.Combobox(lang_frame, textvariable=self.lang_var, values=list(lang_names.keys()),
                       state="readonly", width=15).pack(side=tk.LEFT, padx=5)
 
@@ -169,18 +169,6 @@ class SettingsTab:
             value=", ".join(self.app.settings_mgr.get("cloud_categories", []))
         )
         ttk.Entry(main, textvariable=self.cloud_cats_var, width=60).pack(anchor=tk.W, padx=10)
-
-        # --- Cloud API ---
-        ttk.Separator(main, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=10, pady=10)
-        ttk.Label(main, text=i.t("lbl_cloud_api"), font=("", 12, "bold")).pack(anchor=tk.W, padx=10, pady=5)
-
-        for provider in ["Google Drive", "OneDrive", "Dropbox"]:
-            p_frame = ttk.Frame(main)
-            p_frame.pack(fill=tk.X, padx=10, pady=2)
-            ttk.Label(p_frame, text=provider + ":", width=14).pack(side=tk.LEFT)
-            status = "Not connected"
-            ttk.Label(p_frame, text=status, foreground="gray").pack(side=tk.LEFT, padx=5)
-            ttk.Button(p_frame, text=i.t("lbl_connect"), state=tk.DISABLED).pack(side=tk.LEFT, padx=4)
 
         # --- Ignore List ---
         ttk.Separator(main, orient=tk.HORIZONTAL).pack(fill=tk.X, padx=10, pady=10)

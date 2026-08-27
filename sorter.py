@@ -154,9 +154,16 @@ Examples:
                         help="Output path for backup file")
     parser.add_argument("--portable", action="store_true",
                         help="Run in portable mode")
-    parser.add_argument("--version", action="version", version="Smart Sorter v3.0.2")
+    parser.add_argument("--config", type=str, default=None,
+                        help="Use a custom config directory (headless/portable)")
+    parser.add_argument("--version", action="version", version="Smart Sorter v3.1.0")
 
     args = parser.parse_args()
+
+    if args.config:
+        from core.portable import set_config_dir
+        set_config_dir(args.config)
+        log.info(f"Using config directory: {args.config}")
 
     if args.portable:
         from core.portable import enable_portable_mode

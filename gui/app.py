@@ -43,7 +43,7 @@ from gui.tabs.logging_tab import LoggingTab
 
 
 class SmartSorterApp:
-    VERSION = "3.0.2"
+    VERSION = "3.1.0"
 
     def __init__(self):
         self.root = tk.Tk()
@@ -113,6 +113,14 @@ class SmartSorterApp:
         help_menu.add_separator()
         help_menu.add_command(label=self.i18n.t("menu_about"), command=self._show_about)
         menubar.add_cascade(label=self.i18n.t("menu_help"), menu=help_menu)
+
+        plugin_entries = self.plugin_loader.get_menu_entries(self)
+        if plugin_entries:
+            plugins_menu = tk.Menu(menubar, tearoff=0)
+            for label, callback in plugin_entries:
+                plugins_menu.add_command(label=label, command=callback)
+            menubar.add_cascade(label="Plugins", menu=plugins_menu)
+
         self.root.config(menu=menubar)
 
         self.notebook = ttk.Notebook(self.root)
@@ -132,6 +140,8 @@ class SmartSorterApp:
         for key, tab in self.tabs.items():
             self.notebook.add(tab.frame, text=tab.TAB_TITLE)
 
+        self._add_plugin_tabs()
+
         status_frame = ttk.Frame(self.root)
         status_frame.pack(fill=tk.X, side=tk.BOTTOM)
         self.status_var = tk.StringVar(value=self.i18n.t("lbl_ready"))
@@ -141,6 +151,13 @@ class SmartSorterApp:
                                      cursor="hand2", foreground="#8B6914")
         self.donate_btn.pack(side=tk.RIGHT, padx=4)
         self.donate_btn.bind("<Button-1>", lambda e: self._open_donate())
+
+    def _add_plugin_tabs(self):
+        for title, widget in self.plugin_loader.get_gui_tabs(self):
+            try:
+                self.notebook.add(widget, text=f"  {title}  ")
+            except Exception:
+                pass
 
     def _apply_theme(self):
         theme = self.settings_mgr.get("theme", "default")
@@ -221,14 +238,14 @@ class SmartSorterApp:
         result = self.engine.sort()
         moved = result.get("moved", 0)
         self.root.after(0, lambda: self.status_var.set(f"Auto: {moved} files moved"))
-        self.notification_mgr.notify_sort_complete(result)
+        self.root.after(0, lambda: self.notification_mgr.notify_sort_complete(result))
 
-    def _watcher_sort(self, target_path=None):
-        result = self.engine.sort(target_path=target_path)
+    def _watcher_sort(self, target_path=None, only_files=None):
+        result = self.engine.sort(target_path=target_path, only_files=only_files)
         moved = result.get("moved", 0)
         if moved > 0:
             self.root.after(0, lambda: self.status_var.set(f"Watcher: {moved} files moved"))
-            self.notification_mgr.notify_sort_complete(result)
+            self.root.after(0, lambda: self.notification_mgr.notify_sort_complete(result))
 
     def _start_watcher(self):
         paths = self.settings_mgr.get("monitored_folders", [])
@@ -245,7 +262,7 @@ class SmartSorterApp:
     def _scheduled_cleanup(self):
         base = self.settings_mgr.get("downloads_path", "")
         result = self.retention_mgr.cleanup(base)
-        self.notification_mgr.notify_cleanup(result)
+        self.root.after(0, lambda: self.notification_mgr.notify_cleanup(result))
 
     def _open_donate(self):
         import webbrowser

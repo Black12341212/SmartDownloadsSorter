@@ -69,6 +69,19 @@ class SorterEngine:
             total_errors += result["errors"]
             all_moved_files.extend(result["files"])
 
+        synced = 0
+        cloud_path = self.settings.get("cloud_path")
+        if all_moved_files and cloud_path and not dry_run:
+            try:
+                from core.cloud_sync import sync_to_cloud
+                categories = self.settings.get("cloud_categories", [])
+                synced = len(sync_to_cloud(self.downloads_path, cloud_path,
+                                           categories, all_moved_files))
+                if synced:
+                    log_move("cloud_sync", "", f"{synced} files -> {cloud_path}", "Cloud")
+            except Exception as e:
+                log_error("cloud_sync", str(e))
+
         if self.plugins:
             self.plugins.run_on_complete(all_moved_files)
 
@@ -77,6 +90,7 @@ class SorterEngine:
             "skipped": total_skipped,
             "errors": total_errors,
             "files": all_moved_files,
+            "synced": synced,
             "session_time": datetime.now().isoformat(),
         }
 

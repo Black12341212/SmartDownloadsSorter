@@ -88,7 +88,6 @@ EN = {
     "msg_duplicates_found": "Duplicates: {0} groups | Wasted: {1} MB",
     "msg_deleted_n": "Deleted {0} duplicate files",
     "msg_delete_duplicates": "Delete duplicates from {0} groups?",
-    "msg_path_not_found": "Path not found: {0}",
     "msg_click_refresh": "Click Refresh to load statistics",
     "msg_files": "Files: {0}",
     "msg_total_size": "Total size: {0} MB",
@@ -143,13 +142,6 @@ EN = {
     "lbl_notifications": "Notifications",
     "lbl_notify_on_sort": "Show notification after sorting",
     "lbl_ai_suggestions": "AI Rule Suggestions",
-    "lbl_cloud_api": "Cloud API Integration",
-    "lbl_google_drive": "Google Drive",
-    "lbl_one_drive": "OneDrive",
-    "lbl_dropbox": "Dropbox",
-    "lbl_connect": "Connect",
-    "lbl_disconnect": "Disconnect",
-    "lbl_cleanup_schedule": "Scheduled Cleanup",
     "lbl_cleanup_day": "Cleanup day:",
     "lbl_cleanup_folders": "Folders to clean:",
     "lbl_nested_rules": "Nested/Conditional Rules",
@@ -289,13 +281,6 @@ RU = {
     "lbl_notifications": "Уведомления",
     "lbl_notify_on_sort": "Показывать уведомление после сортировки",
     "lbl_ai_suggestions": "AI-предложения правил",
-    "lbl_cloud_api": "Интеграция с облаками",
-    "lbl_google_drive": "Google Drive",
-    "lbl_one_drive": "OneDrive",
-    "lbl_dropbox": "Dropbox",
-    "lbl_connect": "Подключить",
-    "lbl_disconnect": "Отключить",
-    "lbl_cleanup_schedule": "Запланированная очистка",
     "lbl_cleanup_day": "День очистки:",
     "lbl_cleanup_folders": "Папки для очистки:",
     "lbl_nested_rules": "Вложенные/условные правила",
@@ -329,7 +314,7 @@ class I18n:
                         pass
 
     def set_language(self, lang):
-        if lang in ALL_TRANSLATIONS:
+        if lang in self.translations:
             self.language = lang
 
     def t(self, key, *args):
@@ -346,4 +331,8 @@ class I18n:
         return LANGUAGES.get(lang or self.language, lang)
 
     def get_available_languages(self):
-        return dict(LANGUAGES)
+        langs = dict(LANGUAGES)
+        for code in self.translations:
+            if code not in langs:
+                langs[code] = code
+        return langs

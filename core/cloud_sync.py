@@ -41,9 +41,6 @@ DEFAULT_SETTINGS = {
     "watcher_enabled": False,
     "watcher_interval": 5,
     "portable_mode": False,
-    "cloud_api_enabled": False,
-    "cloud_api_provider": "",
-    "cloud_api_token": "",
     "scheduled_cleanup_enabled": False,
     "scheduled_cleanup_day": "monday",
     "scheduled_cleanup_folders": [],
@@ -52,6 +49,34 @@ DEFAULT_SETTINGS = {
         "pdf_size_analysis": True,
         "pdf_name_patterns": True,
     }
+}
+
+# Expected JSON types for validation/migration. Unknown keys are preserved.
+_SETTING_TYPES = {
+    "downloads_path": str,
+    "cloud_path": str,
+    "cloud_categories": list,
+    "auto_sort_interval": int,
+    "auto_sort_enabled": bool,
+    "sort_by_date": bool,
+    "launch_on_startup": bool,
+    "theme": str,
+    "language": str,
+    "monitored_folders": list,
+    "content_detection_enabled": bool,
+    "notifications_enabled": bool,
+    "notify_on_sort": bool,
+    "retention_enabled": bool,
+    "retention_max_age_days": int,
+    "retention_folders": list,
+    "retention_extensions": list,
+    "watcher_enabled": bool,
+    "watcher_interval": int,
+    "portable_mode": bool,
+    "scheduled_cleanup_enabled": bool,
+    "scheduled_cleanup_day": str,
+    "scheduled_cleanup_folders": list,
+    "pdf_settings": dict,
 }
 
 
@@ -68,10 +93,50 @@ class SettingsManager:
                 with open(self.settings_file, "r", encoding="utf-8") as f:
                     data = f.read().strip()
                     if data:
-                        saved = json.loads(data)
+                        try:
+                            saved = json.loads(data)
+                        except (json.JSONDecodeError, ValueError):
+                            # Corrupt config: keep a backup and start clean.
+                            backup = self.settings_file + ".corrupt"
+                            try:
+                                os.replace(self.settings_file, backup)
+                            except OSError:
+                                pass
+                            saved = {}
                         self._deep_update(self.settings, saved)
+                        self._validate()
         except (json.JSONDecodeError, Exception):
             pass
+
+    def _validate(self):
+        """Coerce known settings to their expected types and fill defaults.
+
+        A corrupt or partially written value (e.g. a string where an int or a
+        list is expected) is reset to the default instead of crashing the app.
+        """
+        for key, expected in _SETTING_TYPES.items():
+            if key not in self.settings:
+                continue
+            value = self.settings[key]
+            if expected is dict:
+                if not isinstance(value, dict):
+                    self.settings[key] = dict(DEFAULT_SETTINGS.get(key, {}))
+            elif expected is list:
+                if not isinstance(value, list):
+                    self.settings[key] = list(DEFAULT_SETTINGS.get(key, []))
+            elif expected is int:
+                try:
+                    self.settings[key] = int(value)
+                except (TypeError, ValueError):
+                    self.settings[key] = DEFAULT_SETTINGS.get(key, 0)
+            elif expected is bool:
+                if not isinstance(value, bool):
+                    self.settings[key] = bool(value)
+            elif expected is str:
+                if not isinstance(value, str):
+                    self.settings[key] = str(DEFAULT_SETTINGS.get(key, ""))
+        if not self.settings.get("downloads_path"):
+            self.settings["downloads_path"] = DEFAULT_SETTINGS["downloads_path"]
 
     def save(self):
         os.makedirs(os.path.dirname(self.settings_file), exist_ok=True)

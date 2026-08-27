@@ -28,17 +28,12 @@ MAGIC_SIGNATURES = {
     b"OTTO": "font/otf",
     b"wOFF": "font/woff",
     b"wOF2": "font/woff2",
-    b"\x00 ITS": "image/tiff",
     b"II\x2a\x00": "image/tiff",
     b"MM\x00\x2a": "image/tiff",
     b"FLV\x01": "video/x-flv",
     b"\x1a\x45\xdf\xa3": "video/webm",
-    b"\x00\x00\x00\x1c": "video/mp4",
-    b"\x00\x00\x00\x20": "video/mp4",
     b"\x4f\x67\x67\x53": "audio/ogg",
     b"fLaC": "audio/flac",
-    b"\x49\x49\x2a\x00": "image/tiff",
-    b"\x4d\x4d\x00\x2a": "image/tiff",
 }
 
 CONTENT_TO_CATEGORY = {
@@ -84,6 +79,11 @@ def detect_content_type(filepath):
         for signature, mime in MAGIC_SIGNATURES.items():
             if header[:len(signature)] == signature:
                 return mime
+        # MP4 / ISO Base Media: a 4-byte box size followed by the 'ftyp' marker.
+        # Relying only on the leading size bytes (e.g. \x00\x00\x00\x1c) produced
+        # false positives on arbitrary binary files, so require the 'ftyp' brand.
+        if len(header) >= 12 and header[4:8] == b"ftyp":
+            return "video/mp4"
         text = header.decode("utf-8", errors="ignore").strip()
         if text and all(c.isprintable() or c in "\n\r\t" for c in text[:16]):
             return "text/plain"

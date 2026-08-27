@@ -32,9 +32,26 @@ def quick_hash(path, max_read=65536):
     return h.hexdigest()
 
 
-def _try_quick_hash(path, max_read=65536):
+def full_hash(path, chunk_size=1048576):
+    """Compute an MD5 of the whole file in chunks.
+
+    The previous quick_hash only inspected the first 64KB plus the file size,
+    which produced false duplicates for files sharing a prefix and length. A
+    full-content hash avoids those false positives.
+    """
+    h = hashlib.md5()
+    with open(path, "rb") as f:
+        while True:
+            chunk = f.read(chunk_size)
+            if not chunk:
+                break
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _try_full_hash(path):
     try:
-        return quick_hash(path, max_read)
+        return full_hash(path)
     except OSError:
         return None
 
@@ -45,7 +62,7 @@ def find_duplicates_by_hash(folder, max_read=65536):
         for fname in files:
             fpath = os.path.join(root, fname)
             try:
-                h = quick_hash(fpath, max_read)
+                h = full_hash(fpath)
                 hash_groups[h].append(fpath)
             except OSError:
                 continue
@@ -75,10 +92,10 @@ def delete_duplicates(group, keep="newest", verify_hash=False):
         return existing[0][0], deleted
 
     if verify_hash:
-        ref = _try_quick_hash(existing[0][0])
+        ref = _try_full_hash(existing[0][0])
         if ref is None:
             return existing[0][0], []
-        verified = [(p, m) for p, m in existing if _try_quick_hash(p) == ref]
+        verified = [(p, m) for p, m in existing if _try_full_hash(p) == ref]
         if len(verified) != len(existing):
             # Group is no longer a set of true duplicates: refuse to delete.
             return existing[0][0], []

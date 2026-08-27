@@ -115,7 +115,11 @@ class FileWatcher:
         try:
             time.sleep(0.5)
             if os.path.exists(filepath) and os.path.isfile(filepath):
-                self.sort_callback(target_path=os.path.dirname(filepath))
+                directory = os.path.dirname(filepath)
+                filename = os.path.basename(filepath)
+                # Sort only the single new file, not the entire folder, to
+                # avoid duplicated work and conflicts with an in-progress sort.
+                self.sort_callback(target_path=directory, only_files=[filename])
         except Exception as e:
             logger.error(f"Watcher event error: {e}")
 

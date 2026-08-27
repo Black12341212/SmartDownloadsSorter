@@ -27,7 +27,10 @@ class Scheduler:
             if self._running:
                 return
             self._running = True
-            self._run_cycle()
+        # Run the first cycle outside the lock so that stop() can cancel the
+        # scheduler immediately instead of blocking until the (possibly long)
+        # sort callback finishes.
+        self._run_cycle()
 
     def stop(self):
         with self._lock:
